@@ -200,6 +200,7 @@ static bool process_disc(MIRAGE_Disc *disc, DiscId *discid) {
 	discid_put(discid, first, last, offsets);
 	printf("%s\n", discid_get_id(discid));
 
+	fprintf(stderr, "FreeDB: %s\n", discid_get_freedb_id(discid));
 	fprintf(stderr, "%s\n", discid_get_submission_url(discid));
 
 	return true;
