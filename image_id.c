@@ -39,17 +39,6 @@ static void print_usage(char *progname);
 static bool process_disc(MIRAGE_Disc *disc, DiscId *discid);
 
 int main(int argc, char *argv[]) {
-	MIRAGE_Mirage *mirage;
-	MIRAGE_DebugContext *mirage_debug = NULL;
-
-	DiscId *discid;
-
-	GObject *disc_gobj;
-	MIRAGE_Disc *disc;
-
-	gchar **file_list;
-	int i, file_count;
-
 	GError *error = NULL;
 
 	print_version();
@@ -60,31 +49,27 @@ int main(int argc, char *argv[]) {
 
 	/* Initialize libraries */
 	g_type_init();
-	mirage = g_object_new(MIRAGE_TYPE_MIRAGE, NULL);
-	discid = discid_new();
+	libmirage_init(&error);
+	if (error) {
+		g_critical("Failed to initialize libmirage: %s\n",
+		           error->message);
+		exit(1);
+	}
+	DiscId *discid = discid_new();
 
-	/*
-	mirage_debug = g_object_new(MIRAGE_TYPE_DEBUG_CONTEXT, NULL);
-	mirage_debug_context_set_debug_mask(mirage_debug,
-			MIRAGE_DEBUG_WARNING,
-			NULL);
-			*/
-
-	file_count = argc - 1;
-	file_list = malloc((file_count + 1) * sizeof (gchar *));
-	for (i = 0; i < file_count; i++) {
+	int file_count = argc - 1;
+	gchar **file_list = malloc((file_count + 1) * sizeof (gchar *));
+	for (int i = 0; i < file_count; i++) {
 		file_list[i] = argv[i+1];
 	}
 	file_list[file_count] = NULL;
 
-	mirage_mirage_create_disc(mirage, file_list, &disc_gobj,
-			G_OBJECT(mirage_debug), &error);
+	GObject *disk_obj = libmirage_create_disc(file_list, NULL, NULL, &error);
 	if (error) {
-		fprintf(stderr, "Cannot open image: %s\n", error->message);
-		return 1;
+		g_critical("Cannot open image: %s\n", error->message);
+		exit(1);
 	}
-
-	disc = MIRAGE_DISC(disc_gobj);
+	MIRAGE_Disc *disc = MIRAGE_DISC(disk_obj);
 
 	process_disc(disc, discid);
 

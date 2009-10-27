@@ -1,0 +1,5 @@
+This is a tool to compute the MusicBrainz disc id from a CD image.
+
+Requirements:
+libdiscid, from http://musicbrainz.org/doc/libdiscid
+libmirage >= 1.2.0, from http://cdemu.sourceforge.net/pkg_libmirage.php
