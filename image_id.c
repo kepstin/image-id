@@ -18,7 +18,7 @@
 
 /*
  * Compile with:
- * gcc image_disc_id.c `pkg-config --cflags --libs libdiscid libmirage`
+ * gcc image_disc_id.c -o disc_id `pkg-config --cflags --libs libdiscid libmirage`
  */
 
 #include <mirage.h>
