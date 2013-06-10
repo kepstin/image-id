@@ -36,7 +36,7 @@ static void print_version();
 /* Print the usage information for the program */
 static void print_usage(char *progname);
 /* Process information for a disc */
-static bool process_disc(MIRAGE_Disc *disc, DiscId *discid);
+static bool process_disc(MirageDisc *disc, DiscId *discid);
 
 int main(int argc, char *argv[]) {
 	GError *error = NULL;
@@ -48,13 +48,13 @@ int main(int argc, char *argv[]) {
 	}
 
 	/* Initialize libraries */
-	g_type_init();
-	libmirage_init(&error);
+	mirage_initialize(&error);
 	if (error) {
 		g_critical("Failed to initialize libmirage: %s\n",
 		           error->message);
 		exit(1);
 	}
+	MirageContext *context = g_object_new(MIRAGE_TYPE_CONTEXT, NULL);
 	DiscId *discid = discid_new();
 
 	int file_count = argc - 1;
@@ -64,12 +64,11 @@ int main(int argc, char *argv[]) {
 	}
 	file_list[file_count] = NULL;
 
-	GObject *disk_obj = libmirage_create_disc(file_list, NULL, NULL, &error);
+	MirageDisc *disc = mirage_context_load_image(context, file_list, &error);
 	if (error) {
 		g_critical("Cannot open image: %s\n", error->message);
 		exit(1);
 	}
-	MIRAGE_Disc *disc = MIRAGE_DISC(disk_obj);
 
 	process_disc(disc, discid);
 
@@ -86,47 +85,41 @@ static void print_usage(char *progname) {
 			progname);
 }
 
-static bool process_disc(MIRAGE_Disc *disc, DiscId *discid) {
+static bool process_disc(MirageDisc *disc, DiscId *discid) {
 	int sessions;
 	GError *error = NULL;
 
 	int first, last;
 	int offsets[100] = {0};
 
-	mirage_disc_get_number_of_sessions(disc, &sessions, &error);
-	if (error) {
-		fprintf(stderr, "Cannot get session count: %s\n", error->message);
-		return false;
-	}
+	sessions = mirage_disc_get_number_of_sessions(disc);
 	fprintf(stderr, "Disc contains %d sessions\n", sessions);
 
 	for (int i = 0; i < sessions; i++) {
-		GObject *session_gobj;
-		MIRAGE_Session *session;
+		MirageSession *session;
 
 		int leadout_length, tracks, type;
 		int session_number, first_track, start_sector, length;
 		int offset;
 
-		mirage_disc_get_session_by_index(disc, i, &session_gobj, &error);
+		session = mirage_disc_get_session_by_index(disc, i, &error);
 		if (error) {
 			fprintf(stderr, "Cannot get session %d: %s\n", i,
 					error->message);
 			continue;
 		}
-		session = MIRAGE_SESSION(session_gobj);
 
-		mirage_session_layout_get_session_number(session, &session_number, NULL);
-		mirage_session_layout_get_first_track(session, &first_track, NULL);
-		mirage_session_layout_get_start_sector(session, &start_sector, NULL);
-		mirage_session_layout_get_length(session, &length, NULL);
+		session_number = mirage_session_layout_get_session_number(session);
+		first_track = mirage_session_layout_get_first_track(session);
+		start_sector = mirage_session_layout_get_start_sector(session);
+		length = mirage_session_layout_get_length(session);
 
 		fprintf(stderr, "session %d: layout: number %d, first track %d, start sector %d, length %d\n",
 				i, session_number, first_track, start_sector, length);
 
-		mirage_session_get_session_type(session, &type, &error);
-		mirage_session_get_leadout_length(session, &leadout_length, NULL);
-		mirage_session_get_number_of_tracks(session, &tracks, NULL);
+		type = mirage_session_get_session_type(session);
+		leadout_length = mirage_session_get_leadout_length(session);
+		tracks = mirage_session_get_number_of_tracks(session);
 
 		fprintf(stderr, "session %d: %d tracks, type %d, leadout length %d\n",
 				i, tracks, type, leadout_length);
@@ -138,28 +131,26 @@ static bool process_disc(MIRAGE_Disc *disc, DiscId *discid) {
 		first = last = first_track;
 
 		for (int j = 0; j < tracks; j++) {
-			GObject *track_gobj;
-			MIRAGE_Track *track;
+			MirageTrack *track;
 
 			int track_start, indices;
 			int track_num, track_start_sector, track_length;
 
-			mirage_session_get_track_by_index(session, j, &track_gobj, &error);
+			track = mirage_session_get_track_by_index(session, j, &error);
 			if (error) {
 				fprintf(stderr, "Cannot get track %d: %s\n", j, error->message);
 				continue;
 			}
-			track = MIRAGE_TRACK(track_gobj);
 
-			mirage_track_layout_get_track_number(track, &track_num, NULL);
-			mirage_track_layout_get_start_sector(track, &track_start_sector, NULL);
-			mirage_track_layout_get_length(track, &track_length, NULL);
+			track_num = mirage_track_layout_get_track_number(track);
+			track_start_sector = mirage_track_layout_get_start_sector(track);
+			track_length = mirage_track_layout_get_length(track);
 
 			fprintf(stderr, "session %d: track %d: layout: number %d, start sector %d, length %d\n",
 					i, j, track_num, track_start_sector + offset, track_length);
 
-			mirage_track_get_track_start(track, &track_start, NULL);
-			mirage_track_get_number_of_indices(track, &indices, NULL);
+			track_start = mirage_track_get_track_start(track);
+			indices = mirage_track_get_number_of_indices(track);
 
 			fprintf(stderr, "session %d: track %d: track start %d, %d indicies\n",
 					i, j,
