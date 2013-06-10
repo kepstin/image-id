@@ -3,8 +3,8 @@
  * Copyright (c) 2008 Calvin Walton
  *
  * This program is free software; you can redistribute it and/or modify it
- * under the terms of version 2 of the GNU General Public License as published
- * by the Free Software Foundation.
+ * under the terms of either version 2, or any later version of the GNU General
+ * Public License as published by the Free Software Foundation.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
@@ -18,7 +18,7 @@
 
 /*
  * Compile with:
- * gcc image_disc_id.c `pkg-config --cflags --libs libdiscid libmirage`
+ * gcc image_id.c -o disc_id `pkg-config --cflags --libs libdiscid libmirage`
  */
 
 #include <mirage.h>
