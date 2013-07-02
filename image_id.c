@@ -1,6 +1,6 @@
 /*
  * Image ID - Calculate MusicBrainz disc TOC numbers from CD Images
- * Copyright (c) 2008 Calvin Walton
+ * Copyright (c) 2013 Calvin Walton
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of either version 2, or any later version of the GNU General
@@ -29,7 +29,7 @@
 
 #define PACKAGE "Image ID"
 #define VERSION "1.0"
-#define COPYRIGHT "Copyright (c) 2008 Calvin Walton"
+#define COPYRIGHT "Copyright (c) 2013 Calvin Walton"
 
 /* Print the version information for the program */
 static void print_version();
