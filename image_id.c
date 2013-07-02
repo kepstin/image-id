@@ -91,6 +91,9 @@ static bool process_disc(MirageDisc *disc, DiscId *discid) {
 
 	int first, last;
 	int offsets[100] = {0};
+	const char *isrcs[100];
+
+	memset(isrcs, 0, 100 * sizeof (char *));
 
 	sessions = mirage_disc_get_number_of_sessions(disc);
 	fprintf(stderr, "Disc contains %d sessions\n", sessions);
@@ -158,6 +161,8 @@ static bool process_disc(MirageDisc *disc, DiscId *discid) {
 					indices);
 
 			offsets[track_num] = track_start + track_start_sector + offset;
+			isrcs[track_num] = mirage_track_get_isrc(track);
+
 			if (track_num > last)
 				last = track_num;
 
@@ -178,6 +183,11 @@ static bool process_disc(MirageDisc *disc, DiscId *discid) {
 
 	fprintf(stderr, "FreeDB: %s\n", discid_get_freedb_id(discid));
 	fprintf(stderr, "%s\n", discid_get_submission_url(discid));
+	for (int i = first; i <= last; i++) {
+		if (isrcs[i] != NULL) {
+			fprintf(stderr, "ISRC Track %d: %s\n", i, isrcs[i]);
+		}
+	}
 
 	return true;
 }
