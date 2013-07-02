@@ -91,6 +91,9 @@ static bool process_disc(MirageDisc *disc, DiscId *discid) {
 
 	int first, last;
 	int offsets[100] = {0};
+	char mcn[13+1] = "\0";
+
+	strncpy(mcn, (char *) mirage_disc_get_mcn(disc), sizeof mcn);
 
 	sessions = mirage_disc_get_number_of_sessions(disc);
 	fprintf(stderr, "Disc contains %d sessions\n", sessions);
@@ -178,6 +181,7 @@ static bool process_disc(MirageDisc *disc, DiscId *discid) {
 
 	fprintf(stderr, "FreeDB: %s\n", discid_get_freedb_id(discid));
 	fprintf(stderr, "%s\n", discid_get_submission_url(discid));
+	fprintf(stderr, "MCN: %s\n", mcn);
 
 	return true;
 }
