@@ -174,10 +174,10 @@ static bool process_disc(MirageDisc *disc, DiscId *discid) {
 	fprintf(stderr, "\n");
 
 	discid_put(discid, first, last, offsets);
-	printf("%s\n", discid_get_id(discid));
+	printf("MusicBrainz Disc ID: %s\n", discid_get_id(discid));
 
-	fprintf(stderr, "FreeDB: %s\n", discid_get_freedb_id(discid));
-	fprintf(stderr, "%s\n", discid_get_submission_url(discid));
+	printf("FreeDB Disc ID: %s\n", discid_get_freedb_id(discid));
+	printf("MusicBrainz Submission URL: %s\n", discid_get_submission_url(discid));
 
 	return true;
 }
