@@ -93,7 +93,7 @@ static bool process_disc(MirageDisc *disc, DiscId *discid) {
 
 	int first, last;
 	int offsets[100] = {0};
-	char isrcs[100][12+1] = {{0}};
+	char isrcs[100][MIRAGE_ISRC_SIZE+1] = {{0}};
 
 	sessions = mirage_disc_get_number_of_sessions(disc);
 	fprintf(stderr, "Disc contains %d sessions\n", sessions);
@@ -178,8 +178,8 @@ static bool process_disc(MirageDisc *disc, DiscId *discid) {
 			offsets[track_num] = track_start + track_start_sector + offset;
 			if (mirage_track_get_isrc(track) != NULL) {
 				strncpy(isrcs[track_num],
-					(char *) mirage_track_get_isrc(track),
-					sizeof isrcs[track_num]);
+					mirage_track_get_isrc(track),
+					MIRAGE_ISRC_SIZE);
 			}
 
 			if (track_num > last)
