@@ -31,6 +31,8 @@
 #define VERSION "1.0"
 #define COPYRIGHT "Copyright (c) 2013 Calvin Walton"
 
+#define DEBUG 0
+
 /* Print the version information for the program */
 static void print_version();
 /* Print the usage information for the program */
@@ -115,18 +117,26 @@ static bool process_disc(MirageDisc *disc, DiscId *discid) {
 		start_sector = mirage_session_layout_get_start_sector(session);
 		length = mirage_session_layout_get_length(session);
 
-		fprintf(stderr, "session %d: layout: number %d, first track %d, start sector %d, length %d\n",
-				i, session_number, first_track, start_sector, length);
+		if (DEBUG) {
+			fprintf(stderr, "session %d: layout: number %d, first track %d, start sector %d, length %d\n",
+				i, session_number, first_track, start_sector,
+				length);
+		}
 
 		type = mirage_session_get_session_type(session);
 		leadout_length = mirage_session_get_leadout_length(session);
 		tracks = mirage_session_get_number_of_tracks(session);
 
-		fprintf(stderr, "session %d: %d tracks, type %d, leadout length %d\n",
+		if (DEBUG) {
+			fprintf(stderr, "session %d: %d tracks, type %d, leadout length %d\n",
 				i, tracks, type, leadout_length);
+		}
 
 		offset = 0 - start_sector;
-		fprintf(stderr, "session %d: calculated offset %d\n", i, offset);
+		if (DEBUG) {
+			fprintf(stderr, "session %d: calculated offset %d\n",
+				i, offset);
+		}
 
 		offsets[0] = length;
 		first = last = first_track;
@@ -147,16 +157,23 @@ static bool process_disc(MirageDisc *disc, DiscId *discid) {
 			track_start_sector = mirage_track_layout_get_start_sector(track);
 			track_length = mirage_track_layout_get_length(track);
 
-			fprintf(stderr, "session %d: track %d: layout: number %d, start sector %d, length %d\n",
-					i, j, track_num, track_start_sector + offset, track_length);
+			if (DEBUG) {
+				fprintf(stderr, "session %d: track %d: layout: number %d, start sector %d, length %d\n",
+					i, j, track_num,
+					track_start_sector + offset,
+					track_length);
+			}
 
 			track_start = mirage_track_get_track_start(track);
 			indices = mirage_track_get_number_of_indices(track);
 
-			fprintf(stderr, "session %d: track %d: track start %d, %d indicies\n",
+			if (DEBUG) {
+				fprintf(stderr, "session %d: track %d: track start %d, %d indicies\n",
 					i, j,
-					track_start + track_start_sector + offset,
+					track_start + track_start_sector
+						    + offset,
 					indices);
+			}
 
 			offsets[track_num] = track_start + track_start_sector + offset;
 			if (mirage_track_get_isrc(track) != NULL) {
@@ -181,13 +198,13 @@ static bool process_disc(MirageDisc *disc, DiscId *discid) {
 	fprintf(stderr, "\n");
 
 	discid_put(discid, first, last, offsets);
-	printf("%s\n", discid_get_id(discid));
+	printf("MusicBrainz Disc ID: %s\n", discid_get_id(discid));
 
-	fprintf(stderr, "FreeDB: %s\n", discid_get_freedb_id(discid));
-	fprintf(stderr, "%s\n", discid_get_submission_url(discid));
+	printf("FreeDB Disc ID: %s\n", discid_get_freedb_id(discid));
+	printf("MusicBrainz Submission URL: %s\n", discid_get_submission_url(discid));
 	for (int i = first; i <= last; i++) {
 		if (strlen(isrcs[i]) > 0) {
-			fprintf(stderr, "ISRC Track %d: %s\n", i, isrcs[i]);
+			printf("ISRC Track %d: %s\n", i, isrcs[i]);
 		}
 	}
 
