@@ -94,7 +94,7 @@ static bool process_disc(MirageDisc *disc, DiscId *discid) {
 	int first, last;
 	int offsets[100] = {0};
 	char isrcs[100][MIRAGE_ISRC_SIZE+1] = {{0}};
-	char mcn[13+1] = "\0";
+	char mcn[MIRAGE_MCN_SIZE+1] = "\0";
 
 	if (mirage_disc_get_mcn(disc) != NULL) {
 		strncpy(mcn, mirage_disc_get_mcn(disc), sizeof mcn);
