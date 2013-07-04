@@ -178,7 +178,7 @@ static bool process_disc(MirageDisc *disc, DiscId *discid) {
 			offsets[track_num] = track_start + track_start_sector + offset;
 			if (mirage_track_get_isrc(track) != NULL) {
 				strncpy(isrcs[track_num],
-					(char *) mirage_track_get_isrc(track),
+					mirage_track_get_isrc(track),
 					sizeof isrcs[track_num]);
 			}
 
