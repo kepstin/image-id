@@ -93,6 +93,11 @@ static bool process_disc(MirageDisc *disc, DiscId *discid) {
 
 	int first, last;
 	int offsets[100] = {0};
+	char mcn[13+1] = "\0";
+
+	if (mirage_disc_get_mcn(disc) != NULL) {
+		strncpy(mcn, mirage_disc_get_mcn(disc), sizeof mcn);
+	}
 
 	sessions = mirage_disc_get_number_of_sessions(disc);
 	fprintf(stderr, "Disc contains %d sessions\n", sessions);
@@ -195,6 +200,9 @@ static bool process_disc(MirageDisc *disc, DiscId *discid) {
 
 	printf("FreeDB Disc ID: %s\n", discid_get_freedb_id(discid));
 	printf("MusicBrainz Submission URL: %s\n", discid_get_submission_url(discid));
+	if (strlen(mcn) > 0) {
+		printf("MCN: %s\n", mcn);
+	}
 
 	return true;
 }
