@@ -91,7 +91,8 @@ static bool process_disc(MirageDisc *disc, DiscId *discid) {
 	int sessions;
 	GError *error = NULL;
 
-	int first, last;
+	int first = 1;
+	int last = 0;
 	int offsets[100] = {0};
 	char isrcs[100][MIRAGE_ISRC_SIZE+1] = {{0}};
 	char mcn[MIRAGE_MCN_SIZE+1] = "\0";
