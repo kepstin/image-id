@@ -96,7 +96,7 @@ static bool process_disc(MirageDisc *disc, DiscId *discid) {
 	char mcn[13+1] = "\0";
 
 	if (mirage_disc_get_mcn(disc) != NULL) {
-		strncpy(mcn, (char *) mirage_disc_get_mcn(disc), sizeof mcn);
+		strncpy(mcn, mirage_disc_get_mcn(disc), sizeof mcn);
 	}
 
 	sessions = mirage_disc_get_number_of_sessions(disc);
