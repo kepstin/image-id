@@ -1,0 +1,2 @@
+bin_PROGRAMS=image_id
+image_id_SOURCES=image_id.c

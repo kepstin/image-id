@@ -28,7 +28,7 @@
 #include <stdlib.h>
 
 #define PACKAGE "Image ID"
-#define VERSION "2.0.0"
+#define VERSION "2.1.0"
 #define COPYRIGHT "Copyright (c) 2014 Calvin Walton, Released under GPLv2"
 
 #define DEBUG 0
