@@ -2,8 +2,21 @@ This is a tool to compute the MusicBrainz disc id from a CD image.
 
 Requirements:
 libdiscid, from http://musicbrainz.org/doc/libdiscid
-libmirage >= 3.0.0, from http://cdemu.sourceforge.net/project/
+libmirage >= 2.1.0, from http://cdemu.sourceforge.net/project/
+
+Known working versions of libmirage are 2.1.x and 3.0.x
 
 Keep in mind that libmirage tends to break API between versions. If image_id
 doesn't work with the latest please either try an older libmirage, open a
 ticket on github, or send me a pull request with the required updates.
+
+This package is built using autotools; the standard invocation:
+
+./configure && make
+(optionally) sudo make install
+
+should give you a working build.
+
+If you are building from git, run
+./autogen.sh
+to generate the configure script.
