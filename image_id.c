@@ -96,7 +96,6 @@ static bool process_disc(MirageDisc *disc, DiscId *discid) {
 	int offsets[100] = {0};
 	char isrcs[100][MIRAGE_ISRC_SIZE+1] = {{0}};
 	char mcn[MIRAGE_MCN_SIZE+1] = {0};
-	bool seen_cdda = false;
 
 	sessions = mirage_disc_get_number_of_sessions(disc);
 	fprintf(stderr, "Disc contains %d sessions\n", sessions);
@@ -134,14 +133,6 @@ static bool process_disc(MirageDisc *disc, DiscId *discid) {
 		if (DEBUG) {
 			fprintf(stderr, "session %d: %d tracks, type %d, leadout length %d\n",
 				i, tracks, type, leadout_length);
-		}
-
-		if (type == MIRAGE_SESSION_CDDA) {
-			seen_cdda = true;
-		}
-		if (type != MIRAGE_SESSION_CDDA && !seen_cdda) {
-			fprintf(stderr, "session is not CDDA, skipping");
-			goto session_skip;
 		}
 
 		session_mcn = mirage_session_get_mcn(session);
@@ -205,8 +196,6 @@ static bool process_disc(MirageDisc *disc, DiscId *discid) {
 
 			g_object_unref(track);
 		}
-
-session_skip:
 
 		g_object_unref(session);
 	}
