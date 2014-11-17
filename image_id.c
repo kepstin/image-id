@@ -29,7 +29,7 @@
 
 #define PACKAGE "Image ID"
 #define VERSION "2.0.0"
-#define COPYRIGHT "Copyright (c) 2014 Calvin Walton"
+#define COPYRIGHT "Copyright (c) 2014 Calvin Walton, Released under GPLv2"
 
 #define DEBUG 0
 
@@ -79,6 +79,8 @@ int main(int argc, char *argv[]) {
 
 static void print_version() {
 	fprintf(stderr, "%s %s\n%s\n", PACKAGE, VERSION, COPYRIGHT);
+	fprintf(stderr, "Using libmirage %s (compiled with %s)\n",
+			mirage_version_long, MIRAGE_VERSION_LONG);
 }
 
 static void print_usage(char *progname) {
