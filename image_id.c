@@ -1,6 +1,6 @@
 /*
  * Image ID - Calculate MusicBrainz disc TOC numbers from CD Images
- * Copyright (c) 2013 Calvin Walton
+ * Copyright (c) 2014 Calvin Walton
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of either version 2, or any later version of the GNU General
@@ -21,15 +21,15 @@
  * gcc image_id.c -o disc_id `pkg-config --cflags --libs libdiscid libmirage`
  */
 
-#include <mirage.h>
+#include <mirage/mirage.h>
 #include <discid/discid.h>
 
 #include <stdbool.h>
 #include <stdlib.h>
 
 #define PACKAGE "Image ID"
-#define VERSION "1.0"
-#define COPYRIGHT "Copyright (c) 2013 Calvin Walton"
+#define VERSION "2.0.0"
+#define COPYRIGHT "Copyright (c) 2014 Calvin Walton"
 
 #define DEBUG 0
 
@@ -95,11 +95,8 @@ static bool process_disc(MirageDisc *disc, DiscId *discid) {
 	int last = 0;
 	int offsets[100] = {0};
 	char isrcs[100][MIRAGE_ISRC_SIZE+1] = {{0}};
-	char mcn[MIRAGE_MCN_SIZE+1] = "\0";
-
-	if (mirage_disc_get_mcn(disc) != NULL) {
-		strncpy(mcn, mirage_disc_get_mcn(disc), sizeof mcn);
-	}
+	char mcn[MIRAGE_MCN_SIZE+1] = {0};
+	bool seen_cdda = false;
 
 	sessions = mirage_disc_get_number_of_sessions(disc);
 	fprintf(stderr, "Disc contains %d sessions\n", sessions);
@@ -110,6 +107,7 @@ static bool process_disc(MirageDisc *disc, DiscId *discid) {
 		int leadout_length, tracks, type;
 		int session_number, first_track, start_sector, length;
 		int offset;
+		const gchar *session_mcn;
 
 		session = mirage_disc_get_session_by_index(disc, i, &error);
 		if (error) {
@@ -137,6 +135,20 @@ static bool process_disc(MirageDisc *disc, DiscId *discid) {
 			fprintf(stderr, "session %d: %d tracks, type %d, leadout length %d\n",
 				i, tracks, type, leadout_length);
 		}
+
+		if (type == MIRAGE_SESSION_CDDA) {
+			seen_cdda = true;
+		}
+		if (type != MIRAGE_SESSION_CDDA && !seen_cdda) {
+			fprintf(stderr, "session is not CDDA, skipping");
+			goto session_skip;
+		}
+
+		session_mcn = mirage_session_get_mcn(session);
+		if (session_mcn != NULL) {
+			strncpy(mcn, session_mcn, sizeof mcn);
+		}
+
 
 		offset = 0 - start_sector;
 		if (DEBUG) {
@@ -193,6 +205,8 @@ static bool process_disc(MirageDisc *disc, DiscId *discid) {
 
 			g_object_unref(track);
 		}
+
+session_skip:
 
 		g_object_unref(session);
 	}
