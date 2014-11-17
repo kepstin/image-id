@@ -13,9 +13,16 @@ AC_PROG_CC_C99
 
 # Checks for libraries.
 PKG_CHECK_MODULES([IMAGE_ID], [libdiscid libmirage >= 2.1.0])
+AC_MSG_CHECKING([if libMirage is 3.0 or later])
 PKG_CHECK_EXISTS([libmirage >= 3.0.0],
-		[AC_DEFINE([HAVE_LIBMIRAGE_3_0_API], [1],
-				[libMirage API is 3.0 or newer])])
+		[libmirage_3_0_api=yes],
+		[libmirage_3_0_api=no])
+if test $libmirage_3_0_api = yes
+then
+	AC_DEFINE([LIBMIRAGE_AT_LEAST_3_0], [1],
+				[libMirage API is 3.0 or newer])
+fi
+AC_MSG_RESULT([$libmirage_3_0_api])
 
 
 # Checks for header files.

@@ -16,19 +16,19 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
-/*
- * Compile with:
- * gcc image_id.c -o disc_id `pkg-config --cflags --libs libdiscid libmirage`
- */
+#include "config.h"
 
+#ifdef LIBMIRAGE_AT_LEAST_3_0
 #include <mirage/mirage.h>
+#else /* libmirage 2.1 */
+#include <mirage.h>
+#endif
+
 #include <discid/discid.h>
 
 #include <stdbool.h>
 #include <stdlib.h>
 
-#define PACKAGE "Image ID"
-#define VERSION "2.1.0"
 #define COPYRIGHT "Copyright (c) 2014 Calvin Walton, Released under GPLv2"
 
 #define DEBUG 0
@@ -78,7 +78,7 @@ int main(int argc, char *argv[]) {
 }
 
 static void print_version() {
-	fprintf(stderr, "%s %s\n%s\n", PACKAGE, VERSION, COPYRIGHT);
+	fprintf(stderr, "%s\n%s\n", PACKAGE_STRING, COPYRIGHT);
 	fprintf(stderr, "Using libmirage %s (compiled with %s)\n",
 			mirage_version_long, MIRAGE_VERSION_LONG);
 }
@@ -99,6 +99,12 @@ static bool process_disc(MirageDisc *disc, DiscId *discid) {
 	char isrcs[100][MIRAGE_ISRC_SIZE+1] = {{0}};
 	char mcn[MIRAGE_MCN_SIZE+1] = {0};
 
+#ifndef LIBMIRAGE_AT_LEAST_3_0
+	if (mirage_disc_get_mcn(disc) != NULL) {
+		strncpy(mcn, mirage_disc_get_mcn(disc), MIRAGE_MCN_SIZE);
+	}
+#endif
+
 	sessions = mirage_disc_get_number_of_sessions(disc);
 	fprintf(stderr, "Disc contains %d sessions\n", sessions);
 
@@ -108,7 +114,6 @@ static bool process_disc(MirageDisc *disc, DiscId *discid) {
 		int leadout_length, tracks, type;
 		int session_number, first_track, start_sector, length;
 		int offset;
-		const gchar *session_mcn;
 
 		session = mirage_disc_get_session_by_index(disc, i, &error);
 		if (error) {
@@ -137,11 +142,12 @@ static bool process_disc(MirageDisc *disc, DiscId *discid) {
 				i, tracks, type, leadout_length);
 		}
 
-		session_mcn = mirage_session_get_mcn(session);
+#ifdef LIBMIRAGE_AT_LEAST_3_0
+		const gchar *session_mcn = mirage_session_get_mcn(session);
 		if (session_mcn != NULL) {
 			strncpy(mcn, session_mcn, sizeof mcn);
 		}
-
+#endif
 
 		offset = 0 - start_sector;
 		if (DEBUG) {
